@@ -36,6 +36,13 @@ export function LearnPage() {
   }, [revealed]);
 
   const loadCards = useCallback(async () => {
+    setDone(false);
+    setCurrentIndex(0);
+    setReviewed(0);
+    setRatings([]);
+    setRevealed(false);
+    setLoading(true);
+
     let ids: string[];
     if (deckId) {
       ids = [deckId];
