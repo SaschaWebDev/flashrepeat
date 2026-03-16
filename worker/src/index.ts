@@ -56,8 +56,9 @@ export default {
     }
 
     // Only handle POST /api/youtube-flashcards
-    if (url.pathname !== '/api/youtube-flashcards' || request.method !== 'POST') {
-      return jsonResponse({ ok: false, error: 'Not found' }, 404, origin);
+    const pathname = url.pathname.replace(/\/+$/, '');
+    if (pathname !== '/api/youtube-flashcards' || request.method !== 'POST') {
+      return jsonResponse({ ok: false, error: 'Not found', code: 'INVALID_URL' }, 404, origin);
     }
 
     // Rate limiting

@@ -49,12 +49,23 @@ export async function generateFlashcardsFromYouTube(
     return { ok: false, error: 'Please enter a valid YouTube URL', code: 'INVALID_URL' };
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/youtube-flashcards`, {
+  const endpoint = `${API_BASE_URL}/api/youtube-flashcards`;
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ videoId, maxCards }),
     signal,
   });
+
+  if (!response.ok) {
+    try {
+      const data = await response.json();
+      return data as YouTubeFlashcardsResult;
+    } catch {
+      console.error(`YouTube API error: ${response.status} from ${endpoint}`);
+      return { ok: false, error: 'Could not reach the flashcard server', code: 'LLM_ERROR' as const };
+    }
+  }
 
   const data: YouTubeFlashcardsResult = await response.json();
   return data;
