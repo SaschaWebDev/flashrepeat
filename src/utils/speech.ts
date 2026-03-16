@@ -5,8 +5,22 @@ interface SpeechSession {
   isListening: boolean;
 }
 
+interface SpeechResult {
+  readonly isFinal: boolean;
+  readonly length: number;
+  readonly [index: number]: { readonly transcript: string };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSpeechCtor(): (new () => any) | undefined {
+  const w = window as unknown as Record<string, unknown>;
+  return (w.SpeechRecognition ?? w.webkitSpeechRecognition) as
+    | (new () => any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    | undefined;
+}
+
 export function isSpeechSupported(): boolean {
-  return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+  return getSpeechCtor() !== undefined;
 }
 
 export function startSpeechRecognition(
@@ -14,21 +28,20 @@ export function startSpeechRecognition(
   onEnd: () => void,
   lang = 'en-US',
 ): SpeechSession {
-  const SpeechRecognition = (window as Record<string, unknown>).SpeechRecognition
-    ?? (window as Record<string, unknown>).webkitSpeechRecognition;
+  const Ctor = getSpeechCtor();
 
-  if (!SpeechRecognition) {
+  if (!Ctor) {
     throw new Error('Speech recognition not supported');
   }
 
-  const recognition = new (SpeechRecognition as new () => SpeechRecognition)();
+  const recognition = new Ctor();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = lang;
 
   let listening = true;
 
-  recognition.onresult = (event: SpeechRecognitionEvent) => {
+  recognition.onresult = (event: { resultIndex: number; results: SpeechResult[] }) => {
     let finalTranscript = '';
     let interimTranscript = '';
 
