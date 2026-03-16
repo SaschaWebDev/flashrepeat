@@ -76,7 +76,7 @@ export function CanvasToolbar({ elements, onChange }: CanvasToolbarProps) {
         disabled={atCap}
         title="Add Text"
       >
-        T
+        Text
       </button>
       <button
         className={styles.toolBtn}
