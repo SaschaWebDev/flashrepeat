@@ -36,8 +36,6 @@ export function CanvasEditor({ elements, onChange, scale }: CanvasEditorProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragState | null>(null);
 
-  const selected = elements.find(e => e.id === selectedId) ?? null;
-
   const getCanvasRect = useCallback(() => {
     return canvasRef.current?.getBoundingClientRect() ?? null;
   }, []);
@@ -192,7 +190,7 @@ export function CanvasEditor({ elements, onChange, scale }: CanvasEditorProps) {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <CanvasRenderer elements={elements} scale={scale} />
+      <CanvasRenderer elements={elements} scale={scale} editingId={editingId} />
 
       {/* Interactive overlays */}
       {sorted.map(el => (
@@ -214,6 +212,7 @@ export function CanvasEditor({ elements, onChange, scale }: CanvasEditorProps) {
               className={styles.inlineEditor}
               value={el.content}
               onChange={e => handleTextChange(el.id, e.target.value)}
+              onFocus={e => e.target.select()}
               onBlur={handleTextBlur}
               onKeyDown={handleTextKeyDown}
               autoFocus

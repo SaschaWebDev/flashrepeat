@@ -5,9 +5,10 @@ interface CanvasRendererProps {
   elements: CanvasElement[];
   scale?: number;
   className?: string;
+  editingId?: string | null;
 }
 
-export function CanvasRenderer({ elements, scale = 1, className }: CanvasRendererProps) {
+export function CanvasRenderer({ elements, scale = 1, className, editingId }: CanvasRendererProps) {
   const sorted = [...elements].sort((a, b) => a.zIndex - b.zIndex);
 
   return (
@@ -36,7 +37,7 @@ export function CanvasRenderer({ elements, scale = 1, className }: CanvasRendere
                 color: el.color ?? '#e8e8f0',
               }}
             >
-              {el.content}
+              {el.id !== editingId && el.content}
             </div>
           ) : (
             <img
