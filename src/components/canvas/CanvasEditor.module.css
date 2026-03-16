@@ -1,0 +1,100 @@
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  user-select: none;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  cursor: move;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  transition: border-color var(--transition-fast);
+}
+
+.overlay:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.selected {
+  border-color: var(--accent) !important;
+}
+
+/* Resize handles */
+.handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border: 2px solid var(--bg-primary);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+.handle_nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+
+.handle_ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+
+.handle_sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+
+.handle_se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
+
+/* Inline text editor */
+.inlineEditor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 4px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.emptyHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+
+.capWarning {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+  font-size: 0.6875rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}

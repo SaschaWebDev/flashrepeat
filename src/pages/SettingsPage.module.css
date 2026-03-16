@@ -1,0 +1,94 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 600px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.hint {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+}
+
+.select,
+.input {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.select:focus,
+.input:focus {
+  border-color: var(--accent);
+}
+
+.input {
+  max-width: 120px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.saveBtn {
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+  min-width: 140px;
+}
+
+.saveBtn:hover {
+  background: var(--accent-hover);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  color: var(--text-tertiary);
+}

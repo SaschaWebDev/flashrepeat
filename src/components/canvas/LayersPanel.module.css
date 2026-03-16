@@ -1,0 +1,99 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.header {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.layer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.layer:hover {
+  background: var(--bg-hover);
+}
+
+.layer.selected {
+  background: var(--accent-muted);
+}
+
+.layerType {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.layerName {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.layerActions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.layer:hover .layerActions {
+  opacity: 1;
+}
+
+.layerBtn,
+.layerDeleteBtn {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  border-radius: 2px;
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+}
+
+.layerBtn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.layerBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.layerDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}

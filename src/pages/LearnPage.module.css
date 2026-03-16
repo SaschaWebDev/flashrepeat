@@ -1,0 +1,61 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: 70vh;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exitBtn {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.exitBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.modeBadge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border-radius: var(--radius-sm);
+}
+
+.shortcutHint {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .shortcutHint {
+    display: none;
+  }
+}

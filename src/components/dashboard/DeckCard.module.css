@@ -1,0 +1,116 @@
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.colorBar {
+  height: 4px;
+  background: var(--deck-color, var(--accent));
+}
+
+.content {
+  padding: var(--space-lg);
+  flex: 1;
+}
+
+.name {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.stats {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.due {
+  color: var(--warning);
+}
+
+.learned {
+  color: var(--success);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+}
+
+.studyBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.studyBtn:hover {
+  background: var(--accent-hover);
+}
+
+.deleteBtn {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.card:hover .deleteBtn {
+  opacity: 0.6;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  opacity: 1 !important;
+}

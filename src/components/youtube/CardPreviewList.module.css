@@ -1,0 +1,102 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.cardItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-card);
+  transition: background var(--transition-fast);
+  cursor: pointer;
+}
+
+.cardItem:hover {
+  background: var(--bg-hover);
+}
+
+.cardItemDeselected {
+  opacity: 0.4;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-light);
+  background: transparent;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  font-size: 0.75rem;
+  color: transparent;
+}
+
+.checkboxChecked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.cardText {
+  flex: 1;
+  min-width: 0;
+}
+
+.front {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.back {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.backCollapsed {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selectBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xs) 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.selectActions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.selectBtn {
+  font-size: 0.75rem;
+  color: var(--accent);
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.selectBtn:hover {
+  background: var(--accent-muted);
+}

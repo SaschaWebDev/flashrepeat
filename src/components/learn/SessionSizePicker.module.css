@@ -1,0 +1,91 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.deckName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.info {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.info strong {
+  color: var(--accent);
+}
+
+.options {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.pill:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.pillActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.pillActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  padding-top: var(--space-sm);
+}
+
+.cancelBtn {
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.cancelBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.startBtn {
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.startBtn:hover {
+  background: var(--accent-hover);
+}
