@@ -114,3 +114,22 @@
   background: rgba(239, 68, 68, 0.15);
   opacity: 1 !important;
 }
+
+.cardSelected {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(99, 102, 241, 0.15);
+}
+
+.checkbox {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 2;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}

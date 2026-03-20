@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Deck, UserSettings } from '../types';
-import { getAllDecks, createDeck, softDeleteDeck, getSettings, getReviewHistory } from '../db/operations';
+import { getAllDecks, createDeck, softDeleteDeck, getSettings, getReviewHistory, mergeDecks } from '../db/operations';
 import { calculateStreak } from '../utils/streak';
 import { DeckCard } from '../components/dashboard/DeckCard';
 import { HeatMap } from '../components/dashboard/HeatMap';
@@ -18,6 +18,12 @@ export function DashboardPage() {
   const [streak, setStreak] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
   const [settings, setSettings] = useState<UserSettings | null>(null);
+
+  // Multi-select & merge
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedDeckIds, setSelectedDeckIds] = useState<Set<string>>(new Set());
+  const [showMerge, setShowMerge] = useState(false);
+  const [mergeName, setMergeName] = useState('');
 
   const loadDecks = useCallback(async () => {
     const [result, s, streakData] = await Promise.all([
@@ -62,6 +68,46 @@ export function DashboardPage() {
     navigate(`/learn?decks=${deckIds}&mode=free-roam&size=50`);
   }
 
+  function toggleSelectMode() {
+    if (selectMode) {
+      setSelectMode(false);
+      setSelectedDeckIds(new Set());
+    } else {
+      setSelectMode(true);
+    }
+  }
+
+  function toggleDeckSelect(id: string) {
+    setSelectedDeckIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function openMergeModal() {
+    const firstSelected = decks.find(d => selectedDeckIds.has(d.id));
+    setMergeName(firstSelected?.name ?? '');
+    setShowMerge(true);
+  }
+
+  async function handleMerge() {
+    if (selectedDeckIds.size < 2) return;
+    const firstSelected = decks.find(d => selectedDeckIds.has(d.id));
+    await mergeDecks(
+      [...selectedDeckIds],
+      mergeName || 'Merged Deck',
+      '',
+      firstSelected?.color,
+    );
+    setShowMerge(false);
+    setSelectMode(false);
+    setSelectedDeckIds(new Set());
+    setMergeName('');
+    loadDecks();
+  }
+
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
   }
@@ -80,9 +126,17 @@ export function DashboardPage() {
         </div>
         <div className={styles.headerActions}>
           {decks.length > 1 && (
-            <button className={styles.freeRoamBtn} onClick={handleStudyAll}>
-              Free Roam
-            </button>
+            <>
+              <button className={styles.freeRoamBtn} onClick={handleStudyAll}>
+                Free Roam
+              </button>
+              <button
+                className={selectMode ? styles.cancelSelectBtn : styles.selectBtn}
+                onClick={toggleSelectMode}
+              >
+                {selectMode ? 'Cancel' : 'Select'}
+              </button>
+            </>
           )}
           <button className={styles.createBtn} onClick={() => setShowCreate(true)}>
             + New Deck
@@ -124,8 +178,25 @@ export function DashboardPage() {
       ) : (
         <div className={styles.grid}>
           {decks.map((deck) => (
-            <DeckCard key={deck.id} deck={deck} onDelete={handleDelete} />
+            <DeckCard
+              key={deck.id}
+              deck={deck}
+              onDelete={handleDelete}
+              selectable={selectMode}
+              selected={selectedDeckIds.has(deck.id)}
+              onToggleSelect={toggleDeckSelect}
+            />
           ))}
+        </div>
+      )}
+
+      {/* Floating bulk bar */}
+      {selectMode && selectedDeckIds.size >= 2 && (
+        <div className={styles.bulkBar}>
+          <span className={styles.bulkCount}>{selectedDeckIds.size} decks selected</span>
+          <button className={styles.mergeBtn} onClick={openMergeModal}>
+            Merge
+          </button>
         </div>
       )}
 
@@ -136,6 +207,40 @@ export function DashboardPage() {
           onSubmit={handleCreate}
           onCancel={() => setShowCreate(false)}
         />
+      </Modal>
+
+      {/* Merge modal */}
+      <Modal open={showMerge} onClose={() => setShowMerge(false)} title="Merge Decks">
+        <div className={styles.mergeContent}>
+          <p className={styles.mergeDescription}>
+            Combine {selectedDeckIds.size} decks into one. All cards will be moved to the new deck and source decks will be removed.
+          </p>
+          <label className={styles.mergeLabel}>
+            Deck name
+            <input
+              className={styles.mergeInput}
+              type="text"
+              value={mergeName}
+              onChange={e => setMergeName(e.target.value)}
+              placeholder="Merged Deck"
+              autoFocus
+            />
+          </label>
+          <div className={styles.mergeActions}>
+            <button
+              className={styles.mergeCancelBtn}
+              onClick={() => setShowMerge(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className={styles.mergeConfirmBtn}
+              onClick={handleMerge}
+            >
+              Merge {selectedDeckIds.size} Decks
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

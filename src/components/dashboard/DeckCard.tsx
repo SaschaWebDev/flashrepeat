@@ -7,9 +7,12 @@ import styles from './DeckCard.module.css';
 interface DeckCardProps {
   deck: Deck;
   onDelete: (id: string) => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
-export function DeckCard({ deck, onDelete }: DeckCardProps) {
+export function DeckCard({ deck, onDelete, selectable, selected, onToggleSelect }: DeckCardProps) {
   const navigate = useNavigate();
   const [stats, setStats] = useState<DeckStats | null>(null);
 
@@ -17,12 +20,30 @@ export function DeckCard({ deck, onDelete }: DeckCardProps) {
     getDeckStats(deck.id).then(setStats);
   }, [deck.id]);
 
+  function handleClick() {
+    if (selectable && onToggleSelect) {
+      onToggleSelect(deck.id);
+    } else {
+      navigate(`/deck/${deck.id}`);
+    }
+  }
+
   return (
     <div
-      className={styles.card}
+      className={`${styles.card} ${selected ? styles.cardSelected : ''}`}
       style={{ '--deck-color': deck.color } as React.CSSProperties}
-      onClick={() => navigate(`/deck/${deck.id}`)}
+      onClick={handleClick}
     >
+      {selectable && (
+        <div className={styles.checkbox}>
+          <input
+            type="checkbox"
+            checked={selected ?? false}
+            onChange={() => onToggleSelect?.(deck.id)}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
       <div className={styles.colorBar} />
       <div className={styles.content}>
         <h3 className={styles.name}>{deck.name}</h3>
@@ -46,29 +67,31 @@ export function DeckCard({ deck, onDelete }: DeckCardProps) {
           </div>
         )}
       </div>
-      <div className={styles.actions}>
-        {stats && stats.totalCards > 0 && (
+      {!selectable && (
+        <div className={styles.actions}>
+          {stats && stats.totalCards > 0 && (
+            <button
+              className={styles.studyBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/deck/${deck.id}`);
+              }}
+            >
+              {stats.dueCards > 0 ? `Study (${stats.dueCards})` : 'Study'}
+            </button>
+          )}
           <button
-            className={styles.studyBtn}
+            className={styles.deleteBtn}
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/deck/${deck.id}`);
+              onDelete(deck.id);
             }}
+            aria-label="Delete deck"
           >
-            {stats.dueCards > 0 ? `Study (${stats.dueCards})` : 'Study'}
+            🗑
           </button>
-        )}
-        <button
-          className={styles.deleteBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(deck.id);
-          }}
-          aria-label="Delete deck"
-        >
-          🗑
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
