@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { CardContent, CanvasElement } from '../../types';
 import { CanvasContainer } from '../canvas/CanvasContainer';
@@ -6,6 +6,7 @@ import { CanvasEditor } from '../canvas/CanvasEditor';
 import { CanvasToolbar } from '../canvas/CanvasToolbar';
 import { ElementProperties } from '../canvas/ElementProperties';
 import { LayersPanel } from '../canvas/LayersPanel';
+import { useHistory } from '../../hooks/useHistory';
 import styles from './CardEditor.module.css';
 
 interface CardEditorProps {
@@ -57,22 +58,24 @@ export function CardEditor({
   onCancel,
   submitLabel = 'Add Card',
 }: CardEditorProps) {
-  const [front, setFront] = useState<CardContent>(initialFront ?? makeDefaultContent());
-  const [back, setBack] = useState<CardContent>(initialBack ?? makeDefaultContent());
+  const frontHistory = useHistory<CardContent>(initialFront ?? makeDefaultContent());
+  const backHistory = useHistory<CardContent>(initialBack ?? makeDefaultContent());
   const [activeSide, setActiveSide] = useState<'front' | 'back'>('front');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
 
-  const activeContent = activeSide === 'front' ? front : back;
-  const setActiveContent = activeSide === 'front' ? setFront : setBack;
+  const front = frontHistory.state;
+  const back = backHistory.state;
+  const activeHistory = activeSide === 'front' ? frontHistory : backHistory;
+  const activeContent = activeHistory.state;
 
   const selectedElement = activeContent.elements.find(e => e.id === selectedElementId) ?? null;
 
   const handleElementsChange = useCallback((elements: CanvasElement[]) => {
-    setActiveContent({ elements });
-  }, [setActiveContent]);
+    activeHistory.push({ elements });
+  }, [activeHistory]);
 
   function handleElementUpdate(updated: CanvasElement) {
-    setActiveContent({
+    activeHistory.push({
       elements: activeContent.elements.map(el =>
         el.id === updated.id ? updated : el
       ),
@@ -81,7 +84,7 @@ export function CardEditor({
 
   function handleElementDelete() {
     if (!selectedElementId) return;
-    setActiveContent({
+    activeHistory.push({
       elements: activeContent.elements.filter(el => el.id !== selectedElementId),
     });
     setSelectedElementId(null);
@@ -91,8 +94,8 @@ export function CardEditor({
     e.preventDefault();
     if (!hasContent(front) || !hasContent(back)) return;
     onSave(front, back);
-    setFront(makeDefaultContent());
-    setBack(makeDefaultContent());
+    frontHistory.reset(makeDefaultContent());
+    backHistory.reset(makeDefaultContent());
     setActiveSide('front');
     setSelectedElementId(null);
   }
@@ -101,6 +104,24 @@ export function CardEditor({
     setActiveSide(side);
     setSelectedElementId(null);
   }
+
+  // Undo/Redo keyboard shortcuts
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        activeHistory.undo();
+      }
+      if (mod && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        activeHistory.redo();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeHistory]);
 
   // Quick text mode: if only 1 text element, show simple textarea
   const singleTextElement = activeContent.elements.length === 1
