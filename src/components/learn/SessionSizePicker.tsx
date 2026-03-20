@@ -7,7 +7,7 @@ interface SessionSizePickerProps {
   deckName: string;
   dueCount: number;
   totalActive: number;
-  onStart: (size: number) => void;
+  onStart: (size: number, reverse: boolean) => void;
   onCancel: () => void;
 }
 
@@ -20,6 +20,7 @@ export function SessionSizePicker({
 }: SessionSizePickerProps) {
   const defaultSize = SIZE_OPTIONS.find(s => s >= dueCount) ?? SIZE_OPTIONS[0];
   const [selected, setSelected] = useState<number>(dueCount > 0 ? defaultSize : 15);
+  const [reverse, setReverse] = useState(false);
 
   return (
     <div className={styles.picker}>
@@ -51,11 +52,22 @@ export function SessionSizePicker({
         </button>
       </div>
 
+      {/* Feature 7: Reverse mode toggle */}
+      <label className={styles.reverseToggle}>
+        <input
+          type="checkbox"
+          checked={reverse}
+          onChange={e => setReverse(e.target.checked)}
+          className={styles.reverseCheckbox}
+        />
+        <span className={styles.reverseLabel}>Reverse mode (answer → question)</span>
+      </label>
+
       <div className={styles.actions}>
         <button className={styles.cancelBtn} onClick={onCancel}>
           Cancel
         </button>
-        <button className={styles.startBtn} onClick={() => onStart(selected)}>
+        <button className={styles.startBtn} onClick={() => onStart(selected, reverse)}>
           Start Session
         </button>
       </div>

@@ -215,6 +215,21 @@
   display: none;
 }
 
+.cramNextBtn {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.cramNextBtn:hover {
+  background: var(--accent-hover);
+}
+
 @media (min-width: 640px) {
   .ratingSub {
     display: block;

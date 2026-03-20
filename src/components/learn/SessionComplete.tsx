@@ -10,9 +10,10 @@ interface SessionCompleteProps {
   deckIds?: string[];
   mode?: string;
   lastSessionSize?: number;
+  isCram?: boolean;
 }
 
-export function SessionComplete({ reviewed, deckId, ratings = [], deckIds, mode, lastSessionSize }: SessionCompleteProps) {
+export function SessionComplete({ reviewed, deckId, ratings = [], deckIds, mode, lastSessionSize, isCram }: SessionCompleteProps) {
   const navigate = useNavigate();
 
   // Calculate accuracy (Good/Easy/Perfect = correct)
@@ -30,8 +31,8 @@ export function SessionComplete({ reviewed, deckId, ratings = [], deckIds, mode,
       <div className={styles.icon}>🎉</div>
       <h2 className={styles.title}>Session Complete</h2>
       <p className={styles.subtitle}>
-        You reviewed <strong>{reviewed}</strong> card{reviewed !== 1 ? 's' : ''}
-        {ratings.length > 0 && (
+        You {isCram ? 'crammed' : 'reviewed'} <strong>{reviewed}</strong> card{reviewed !== 1 ? 's' : ''}
+        {!isCram && ratings.length > 0 && (
           <> with <strong>{accuracy}%</strong> accuracy</>
         )}
       </p>

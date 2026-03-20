@@ -6,19 +6,30 @@ import styles from './StudyCard.module.css';
 
 interface StudyCardProps {
   card: Card;
-  onRate: (rating: Rating) => void;
+  onRate?: (rating: Rating) => void;
+  onCramNext?: () => void;
   onFlag?: () => void;
   isFlagged?: boolean;
   progress: { current: number; total: number };
   showCelebration?: boolean;
+  reverse?: boolean;
+  isCram?: boolean;
 }
 
-export function StudyCard({ card, onRate, onFlag, isFlagged, progress, showCelebration }: StudyCardProps) {
+export function StudyCard({ card, onRate, onCramNext, onFlag, isFlagged, progress, showCelebration, reverse, isCram }: StudyCardProps) {
   const [revealed, setRevealed] = useState(false);
+
+  const questionContent = reverse ? card.back : card.front;
+  const answerContent = reverse ? card.front : card.back;
 
   function handleRate(rating: Rating) {
     setRevealed(false);
-    onRate(rating);
+    onRate?.(rating);
+  }
+
+  function handleCramNext() {
+    setRevealed(false);
+    onCramNext?.();
   }
 
   return (
@@ -52,14 +63,14 @@ export function StudyCard({ card, onRate, onFlag, isFlagged, progress, showCeleb
         <div className={styles.cardInner}>
           <div className={styles.cardFront}>
             <div className={styles.canvasWrap}>
-              <CanvasRenderer elements={card.front.elements} />
+              <CanvasRenderer elements={questionContent.elements} />
             </div>
             <p className={styles.tapHint}>Tap to reveal</p>
           </div>
           <div className={styles.cardBack}>
-            <p className={styles.sideLabel}>Answer</p>
+            <p className={styles.sideLabel}>{reverse ? 'Question' : 'Answer'}</p>
             <div className={styles.canvasWrap}>
-              <CanvasRenderer elements={card.back.elements} />
+              <CanvasRenderer elements={answerContent.elements} />
             </div>
           </div>
         </div>
@@ -71,7 +82,15 @@ export function StudyCard({ card, onRate, onFlag, isFlagged, progress, showCeleb
         </div>
       )}
 
-      {revealed && (
+      {revealed && isCram && (
+        <div className={styles.ratingBar}>
+          <button className={styles.cramNextBtn} onClick={handleCramNext}>
+            Next Card
+          </button>
+        </div>
+      )}
+
+      {revealed && !isCram && onRate && (
         <div className={styles.ratingBar}>
           <p className={styles.ratingPrompt}>How well did you know this?</p>
           <div className={styles.ratingButtons}>

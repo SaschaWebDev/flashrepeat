@@ -46,6 +46,38 @@
   color: var(--text-tertiary);
 }
 
+.cramBadge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(234, 179, 8, 0.15);
+  color: var(--warning);
+  border-radius: var(--radius-sm);
+}
+
+.leechToast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--danger);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 200;
+  animation: toastSlide 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .loading {
   display: flex;
   align-items: center;
