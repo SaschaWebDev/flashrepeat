@@ -27,3 +27,11 @@ dist-ssr
 .env
 .env.*
 worker/.dev.vars
+
+# Build artifacts
+.wrangler
+bun.lock
+
+# Test data
+docs/*.apkg
+docs/*.csv

@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   dailyOverdueCap: 50,
   lastStudyDate: null,
   currentStreak: 0,
+  theme: 'dark',
+  leechThreshold: 4,
 };
 
 // ── Settings operations ──
@@ -133,6 +135,8 @@ export async function createCard(
   status: 'active' | 'draft' = 'active',
 ): Promise<Card> {
   const now = Date.now();
+  const existing = await db.cards.where('deckId').equals(deckId).toArray();
+  const maxOrder = existing.reduce((max, c) => Math.max(max, c.sortOrder ?? 0), -1);
   const card: Card = {
     id: uuidv4(),
     deckId,
@@ -144,6 +148,7 @@ export async function createCard(
     deletedAt: null,
     flaggedAt: null,
     status,
+    sortOrder: maxOrder + 1,
   };
   await db.cards.add(card);
   return card;
@@ -252,7 +257,9 @@ export async function bulkCreateCards(
   status: 'active' | 'draft' = 'active',
 ): Promise<void> {
   const now = Date.now();
-  const records: Card[] = cards.map((c) => ({
+  const existing = await db.cards.where('deckId').equals(deckId).toArray();
+  const maxOrder = existing.reduce((max, c) => Math.max(max, c.sortOrder ?? 0), -1);
+  const records: Card[] = cards.map((c, i) => ({
     id: uuidv4(),
     deckId,
     front: c.front,
@@ -263,6 +270,7 @@ export async function bulkCreateCards(
     deletedAt: null,
     flaggedAt: null,
     status,
+    sortOrder: maxOrder + 1 + i,
   }));
   await db.transaction('rw', db.cards, async () => {
     await db.cards.bulkAdd(records);
@@ -276,6 +284,213 @@ export async function bulkApproveCards(cardIds: string[]): Promise<void> {
       await db.cards.update(id, { status: 'active' as const, updatedAt: now });
     }
   });
+}
+
+// ── Duplicate card ──
+
+export async function duplicateCard(cardId: string): Promise<Card | null> {
+  const original = await db.cards.get(cardId);
+  if (!original || original.deletedAt !== null) return null;
+
+  const now = Date.now();
+  const existing = await db.cards.where('deckId').equals(original.deckId).toArray();
+  const maxOrder = existing.reduce((max, c) => Math.max(max, c.sortOrder ?? 0), -1);
+
+  // Clone front, append "(copy)" to first text element
+  const frontElements = original.front.elements.map((el, i) => {
+    if (i === 0 && el.type === 'text' && el.content.trim().length > 0) {
+      return { ...el, id: uuidv4(), content: el.content + ' (copy)' };
+    }
+    return { ...el, id: uuidv4() };
+  });
+
+  const backElements = original.back.elements.map(el => ({ ...el, id: uuidv4() }));
+
+  const card: Card = {
+    id: uuidv4(),
+    deckId: original.deckId,
+    front: { elements: frontElements },
+    back: { elements: backElements },
+    srs: {
+      easeFactor: 2.5,
+      interval: 0,
+      repetitions: 0,
+      nextReviewDate: 0,
+      lastReviewDate: null,
+    },
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+    flaggedAt: null,
+    status: 'active',
+    sortOrder: maxOrder + 1,
+  };
+
+  await db.cards.add(card);
+  return card;
+}
+
+// ── Bulk operations ──
+
+export async function bulkDeleteCards(cardIds: string[]): Promise<void> {
+  const now = Date.now();
+  await db.transaction('rw', db.cards, async () => {
+    for (const id of cardIds) {
+      await db.cards.update(id, { deletedAt: now, updatedAt: now });
+    }
+  });
+}
+
+export async function bulkMoveCards(cardIds: string[], targetDeckId: string): Promise<void> {
+  const now = Date.now();
+  await db.transaction('rw', db.cards, async () => {
+    for (const id of cardIds) {
+      await db.cards.update(id, { deckId: targetDeckId, updatedAt: now });
+    }
+  });
+}
+
+export async function bulkFlagCards(cardIds: string[], flag: boolean): Promise<void> {
+  const now = Date.now();
+  await db.transaction('rw', db.cards, async () => {
+    for (const id of cardIds) {
+      await db.cards.update(id, {
+        flaggedAt: flag ? now : null,
+        updatedAt: now,
+      });
+    }
+  });
+}
+
+// ── Leech detection ──
+
+export async function getLeechCards(deckId: string, threshold = 4): Promise<Set<string>> {
+  const reviews = await db.reviewHistory
+    .where('deckId')
+    .equals(deckId)
+    .toArray();
+
+  const againCounts = new Map<string, number>();
+  for (const r of reviews) {
+    if (r.rating === 1) {
+      againCounts.set(r.cardId, (againCounts.get(r.cardId) ?? 0) + 1);
+    }
+  }
+
+  const leeches = new Set<string>();
+  for (const [cardId, count] of againCounts) {
+    if (count >= threshold) {
+      leeches.add(cardId);
+    }
+  }
+
+  return leeches;
+}
+
+export async function checkAndFlagLeech(cardId: string, deckId: string, threshold = 4): Promise<boolean> {
+  const reviews = await db.reviewHistory
+    .where('cardId')
+    .equals(cardId)
+    .toArray();
+
+  const againCount = reviews.filter(r => r.rating === 1).length;
+  if (againCount >= threshold) {
+    const card = await db.cards.get(cardId);
+    if (card && !card.flaggedAt) {
+      await db.cards.update(cardId, { flaggedAt: Date.now(), updatedAt: Date.now() });
+    }
+    return true;
+  }
+  return false;
+}
+
+export async function getBestRatingsForDeck(deckId: string): Promise<Map<string, Rating>> {
+  const reviews = await db.reviewHistory
+    .where('deckId')
+    .equals(deckId)
+    .toArray();
+
+  const best = new Map<string, Rating>();
+  for (const r of reviews) {
+    const current = best.get(r.cardId);
+    if (current === undefined || r.rating > current) {
+      best.set(r.cardId, r.rating);
+    }
+  }
+  return best;
+}
+
+export async function bulkUpdateCardOrder(updates: Array<{ id: string; sortOrder: number }>): Promise<void> {
+  const now = Date.now();
+  await db.transaction('rw', db.cards, async () => {
+    for (const u of updates) {
+      await db.cards.update(u.id, { sortOrder: u.sortOrder, updatedAt: now });
+    }
+  });
+}
+
+export async function moveCardToDeck(cardId: string, targetDeckId: string): Promise<void> {
+  await bulkMoveCards([cardId], targetDeckId);
+}
+
+export async function mergeDecks(
+  sourceDeckIds: string[],
+  name: string,
+  description = '',
+  color = '#6366f1',
+): Promise<Deck> {
+  const now = Date.now();
+  const newDeckId = uuidv4();
+  const newDeck: Deck = {
+    id: newDeckId,
+    name,
+    description,
+    color,
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+  };
+
+  await db.transaction('rw', db.decks, db.cards, db.reviewHistory, async () => {
+    await db.decks.add(newDeck);
+
+    let sortCounter = 0;
+    for (const deckId of sourceDeckIds) {
+      const cards = await db.cards
+        .where('deckId')
+        .equals(deckId)
+        .toArray()
+        .then(c => c.filter(card => card.deletedAt === null && card.status === 'active'));
+
+      cards.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      for (const card of cards) {
+        await db.cards.update(card.id, {
+          deckId: newDeckId,
+          sortOrder: sortCounter++,
+          updatedAt: now,
+        });
+      }
+    }
+
+    // Update review history to point to new deck
+    for (const deckId of sourceDeckIds) {
+      await db.reviewHistory
+        .where('deckId')
+        .equals(deckId)
+        .modify({ deckId: newDeckId });
+    }
+
+    // Soft-delete source decks and their remaining cards (drafts, already-deleted)
+    for (const deckId of sourceDeckIds) {
+      await db.decks.update(deckId, { deletedAt: now, updatedAt: now });
+      await db.cards.where('deckId').equals(deckId).modify({
+        deletedAt: now,
+        updatedAt: now,
+      });
+    }
+  });
+
+  return newDeck;
 }
 
 export async function getDeckStats(deckId: string): Promise<DeckStats> {

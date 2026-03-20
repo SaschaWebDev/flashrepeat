@@ -19,6 +19,7 @@ export interface Card {
   deletedAt: number | null;
   flaggedAt: number | null;
   status: 'active' | 'draft';
+  sortOrder: number;
 }
 
 export interface CardContent {
@@ -80,6 +81,8 @@ export interface DeckStats {
   learnedCards: number;
 }
 
+export type ThemeMode = 'dark' | 'light' | 'system';
+
 export interface UserSettings {
   id: string; // always 'default'
   homeTimezone: string;
@@ -87,6 +90,8 @@ export interface UserSettings {
   dailyOverdueCap: number;
   lastStudyDate: number | null;
   currentStreak: number;
+  theme: ThemeMode;
+  leechThreshold: number;
 }
 
 export interface ReviewRecord {

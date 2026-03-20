@@ -26,6 +26,42 @@ class FlashRepeatDB extends Dexie {
         if (card.status === undefined) card.status = 'active';
       });
     });
+
+    this.version(3).stores({
+      decks: 'id, name, deletedAt, updatedAt',
+      cards: 'id, deckId, [deckId+srs.nextReviewDate], deletedAt, updatedAt, flaggedAt, status',
+      settings: 'id',
+      reviewHistory: 'id, cardId, deckId, reviewedAt',
+    }).upgrade(tx => {
+      return tx.table('settings').toCollection().modify(settings => {
+        if (settings.theme === undefined) settings.theme = 'dark';
+        if (settings.leechThreshold === undefined) settings.leechThreshold = 4;
+      });
+    });
+
+    this.version(4).stores({
+      decks: 'id, name, deletedAt, updatedAt',
+      cards: 'id, deckId, [deckId+srs.nextReviewDate], deletedAt, updatedAt, flaggedAt, status, sortOrder',
+      settings: 'id',
+      reviewHistory: 'id, cardId, deckId, reviewedAt',
+    }).upgrade(tx => {
+      return tx.table('cards').toArray().then(cards => {
+        const byDeck = new Map<string, typeof cards>();
+        for (const card of cards) {
+          const group = byDeck.get(card.deckId) ?? [];
+          group.push(card);
+          byDeck.set(card.deckId, group);
+        }
+        const updates: Promise<number>[] = [];
+        for (const group of byDeck.values()) {
+          group.sort((a: { createdAt: number }, b: { createdAt: number }) => a.createdAt - b.createdAt);
+          for (let i = 0; i < group.length; i++) {
+            updates.push(tx.table('cards').update(group[i].id, { sortOrder: i }));
+          }
+        }
+        return Promise.all(updates);
+      });
+    });
   }
 }
 
