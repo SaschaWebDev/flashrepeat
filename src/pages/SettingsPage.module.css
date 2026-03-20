@@ -65,6 +65,82 @@
   max-width: 120px;
 }
 
+/* Theme toggle */
+.themeOptions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.themePill {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.themePill:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.themePillActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.themePillActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Export/Import */
+.exportAllBtn {
+  align-self: flex-start;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.exportAllBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.fileInput {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.fileInput::file-selector-button {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  margin-right: var(--space-sm);
+}
+
+.importStatus {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
 .actions {
   display: flex;
   justify-content: flex-start;
