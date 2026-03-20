@@ -4,25 +4,32 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently --names vite,worker --prefix-colors blue,green \"vite\" \"cd worker && npx wrangler dev --port 8788\"",
+    "dev:frontend": "vite",
+    "dev:worker": "cd worker && npx wrangler dev --port 8788",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node -e \"const fs=require('fs'),p='node_modules/sql.js/dist/sql-wasm.wasm';if(fs.existsSync(p))fs.copyFileSync(p,'public/sql-wasm.wasm')\""
   },
   "dependencies": {
     "dexie": "^4.3.0",
     "dexie-react-hooks": "^4.2.0",
+    "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.13.1",
+    "sql.js": "^1.14.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
+    "@types/sql.js": "^1.4.9",
     "@types/uuid": "^11.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",

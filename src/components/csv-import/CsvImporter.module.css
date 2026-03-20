@@ -1,0 +1,176 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Step 1: File input */
+.fileZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-lg);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.fileZone:hover {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.fileIcon {
+  font-size: 2rem;
+  opacity: 0.6;
+}
+
+.fileLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fileHint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* Preview (reuse YouTube styles) */
+.previewHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.fileName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cardCount {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.deckPicker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.deckPickerLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.deckSelect {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.deckSelect:focus {
+  border-color: var(--accent);
+}
+
+.importBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--success);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: opacity var(--transition-fast);
+  align-self: flex-start;
+}
+
+.importBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.importBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Confirmation */
+.confirmState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) 0;
+  text-align: center;
+}
+
+.confirmIcon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.confirmTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.confirmDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.viewDeckBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.viewDeckBtn:hover {
+  background: var(--accent-hover);
+}
+
+.anotherBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.anotherBtn:hover {
+  background: var(--bg-hover);
+}
+
+/* Error */
+.error {
+  font-size: 0.8125rem;
+  color: var(--danger);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm);
+}
